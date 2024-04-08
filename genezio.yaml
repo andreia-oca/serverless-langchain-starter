@@ -42,6 +42,4 @@ frontend:
     # List of scripts that build your frontend before deployment. It should populate the specified `publish` directory.
     build: npm run build
     # List of scripts to run when starting the local development server.
-    start:
-      - npm install
-      - npm run dev
+  subdomain: ivory-electoral-swordtail

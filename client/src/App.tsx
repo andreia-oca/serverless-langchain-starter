@@ -4,11 +4,11 @@ import { BackendService } from "@genezio-sdk/langchain-starter";
 import "./App.css";
 
 export default function App() {
-  const [name, setName] = useState("");
+  const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
 
-  async function sayHello() {
-    setResponse(await BackendService.hello(name));
+  async function askOpenAI() {
+    setResponse(await BackendService.ask(question));
   }
 
   return (
@@ -30,18 +30,18 @@ export default function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Genezio + React = ❤️</h1>
+      <h1>Genezio + OpenAI = ❤️</h1>
       <div className="card">
         <input
           type="text"
           className="input-box"
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your name"
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="What's your question?"
         />
         <br />
         <br />
 
-        <button onClick={() => sayHello()}>Say Hello</button>
+        <button onClick={() => askOpenAI()}>Get your answer</button>
         <p className="read-the-docs">{response}</p>
       </div>
     </>

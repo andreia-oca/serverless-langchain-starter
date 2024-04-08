@@ -1,40 +1,47 @@
-import { GenezioDeploy, GenezioMethod } from "@genezio/types";
-import fetch from "node-fetch";
-
-type SuccessResponse = {
-  status: "success";
-  country: string;
-  lat: number;
-  lon: number;
-  city: string;
-};
-
-type ErrorResponse = {
-  status: "fail";
-};
+import { GenezioDeploy } from "@genezio/types";
+import { LanceDB } from "@langchain/community/vectorstores/lancedb";
+import { loadQARefineChain, RetrievalQAChain } from "langchain/chains";
+import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import * as lancedb from "vectordb";
+// import { createVector } from "./CreateVectorDatabase";
 
 @GenezioDeploy()
 export class BackendService {
   constructor() {}
 
-  @GenezioMethod()
-  async hello(name: string): Promise<string> {
-    const ipLocation: SuccessResponse | ErrorResponse = await fetch(
-      "http://ip-api.com/json/"
-    )
-      .then((res) => res.json() as Promise<SuccessResponse>)
-      .catch(() => ({ status: "fail" }));
+  async ask(question: string): Promise<string> {
+    console.log("Attempting to answer:", question)
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-    if (ipLocation.status === "fail") {
-      return `Hello ${name}! Failed to get the server location :(`;
-    }
+    if (!OPENAI_API_KEY) {
+			throw new Error("You need to provide an OpenAI API key. Go to https://platform.openai.com/account/api-keys to get one.");
+		}
 
-    const formattedTime = new Date().toLocaleString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    const database = "./server/lancedb";
 
-    return `Hello ${name}! This response was served from ${ipLocation.city}, ${ipLocation.country} (${ipLocation.lat}, ${ipLocation.lon}) at ${formattedTime}`;
+    const model = new OpenAI({
+			modelName: "gpt-4",
+			openAIApiKey: OPENAI_API_KEY,
+      temperature: 0.5,
+			verbose: true
+		});
+
+    const db = await lancedb.connect(database);
+
+    const table = await db.openTable('vectors')
+
+    const vectorStore = new LanceDB(new OpenAIEmbeddings, { table })
+
+		const chain = new RetrievalQAChain({
+      combineDocumentsChain: loadQARefineChain(model),
+      retriever: vectorStore.asRetriever(),
+    })
+
+    const response = await chain.invoke({
+			query: question,
+		});
+
+    console.log("Answer:", response)
+    return response.text;
   }
 }
