@@ -18,7 +18,9 @@ backend:
   # Scripts are running in the specified `path` directory.
   scripts:
     # List of scripts to run before deploying the backend.
-    deploy: npm install
+    deploy:
+      - npm install @lancedb/vectordb-linux-x64-gnu
+      - npm install
     # List of scripts to run before starting `genezio local`.
     local: npm install
   # The cloud provider where the backend is deployed.
