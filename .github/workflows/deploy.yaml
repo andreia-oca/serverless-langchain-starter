@@ -25,6 +25,8 @@ jobs:
       - name: Install genezio cli dev
         working-directory: genezio
         run: npm install && npm run install-locally-dev
+      - name: Genezio login
+        run: genezio login ${{ secrets.GENEZIO_TOKEN }}
       - name: Deploy backend
         working-directory: langchain-starter
         run: genezio deploy
