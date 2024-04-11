@@ -14,6 +14,7 @@ backend:
     name: ts
     # The package manager used by the backend.
     packageManager: npm
+    architecture: x86_64
   # Scripts are running in the specified `path` directory.
   scripts:
     # List of scripts to run before deploying the backend.
