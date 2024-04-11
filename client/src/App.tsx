@@ -3,12 +3,24 @@ import reactLogo from "./assets/react.svg";
 import { BackendService } from "@genezio-sdk/langchain-starter";
 import "./App.css";
 
+const Spinner = () => (
+  <div className="spinner-container">
+    <div className="spinner"></div>
+  </div>
+);
+
 export default function App() {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   async function askOpenAI() {
-    setResponse(await BackendService.ask(question));
+    setIsLoading(true);
+    setTimeout(async () => {
+      setResponse(await BackendService.ask(question));
+      setIsLoading(false);
+    }, 10000);
   }
 
   return (
@@ -41,8 +53,15 @@ export default function App() {
         <br />
         <br />
 
-        <button onClick={() => askOpenAI()}>Get your answer</button>
-        <p className="read-the-docs">{response}</p>
+      <div>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <button onClick={askOpenAI}>Get your answer</button>
+      )}
+      <p className="read-the-docs">{response}</p>
+      </div>
+
       </div>
     </>
   );
