@@ -43,7 +43,7 @@ export class BackendService {
         "ai",
         `Answer the question based on only the following context. If the information is not in the context, use your previous knowledge to answer the question.
 
-    {context}`,
+{context}`,
       ],
       ["human", "{question}"],
     ]);
@@ -62,8 +62,8 @@ export class BackendService {
 
     console.log("Ready to invoke")
     const response = await chain.invoke(question);
-
     console.log("Invoked successfully")
+
     console.log("Answer:", response)
     return response;
   }

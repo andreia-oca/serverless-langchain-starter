@@ -19,7 +19,7 @@ export async function createVector() {
       );
     }
 
-    const database = "lancedb";
+    const database = "./lancedb";
     if (!fs.existsSync(database)) {
       try {
         fs.mkdirSync(database);
@@ -40,9 +40,6 @@ export async function createVector() {
 
     const documents = await readDocuments("./data")
 
-    const table_2 = await db.openTable('vectors');
-    console.log(table_2.name)
-
     const vectorStore = await LanceDB.fromDocuments(
       documents,
       embeddings,
@@ -53,7 +50,6 @@ export async function createVector() {
 }
 
 async function readDocuments(directoryPath: string) {
-
   const loader = new DirectoryLoader(
     directoryPath,
     {
