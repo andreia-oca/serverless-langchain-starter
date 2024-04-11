@@ -8,13 +8,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+        DISABLE_AB_TESTING: 'true'
     steps:
       - uses: actions/checkout@v4
+        with:
+            path: langchain-starter
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: Genez-io/genezio-github-action@v1
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GENEZIO_TOKEN }}
+            repository: "Genez-io/genezio"
+            ref: dev
+            path: genezio
+      - name: Install genezio cli dev
+        working-directory: genezio
+        run: npm install && npm run install-locally-dev
       - name: Deploy backend
+        working-directory: langchain-starter
         run: genezio deploy
