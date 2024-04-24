@@ -1,6 +1,6 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
-import { BackendService, UserQuestion } from "@genezio-sdk/langchain-starter";
+import { BackendService } from "@genezio-sdk/langchain-starter";
 import "./App.css";
 
 const Spinner = () => (
@@ -12,17 +12,12 @@ const Spinner = () => (
 export default function App() {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
-  const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function askOpenAI() {
     setIsLoading(true);
-    const q: UserQuestion = {
-      content: question,
-      prompt: prompt,
-    };
     setTimeout(async () => {
-      setResponse(await BackendService.ask(q));
+      setResponse(await BackendService.ask(question));
       setIsLoading(false);
     }, 10000);
   }
@@ -53,14 +48,6 @@ export default function App() {
           className="input-box"
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="What's your question?"
-        />
-        <br />
-        <br />
-        <input
-          type="text"
-          className="input-box"
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="What's your prompt?"
         />
         <br />
         <br />
