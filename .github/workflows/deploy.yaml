@@ -17,16 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: actions/checkout@v4
+      - uses: Genez-io/genezio-github-action@v1
         with:
-            repository: "Genez-io/genezio"
-            ref: dev
-            path: genezio
-      - name: Install genezio cli dev
-        working-directory: genezio
-        run: npm install && npm run install-locally-dev
-      - name: Genezio login
-        run: genezio login ${{ secrets.GENEZIO_TOKEN }}
+          token: ${{ secrets.GENEZIO_PROD_TOKEN }}
       - name: Deploy backend
         working-directory: langchain-starter
         run: genezio deploy

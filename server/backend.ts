@@ -10,11 +10,23 @@ import {
 } from "@langchain/core/runnables";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
+export type UserQuestion = {
+  content: string;
+  prompt?: string;
+}
+
 @GenezioDeploy()
 export class BackendService {
+  model = new OpenAI({
+    modelName: "gpt-4",
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    temperature: 0.5,
+    verbose: true
+  });
+
   constructor() {}
 
-  async ask(question: string): Promise<string> {
+  async ask(question: UserQuestion): Promise<string> {
     console.log("Attempting to answer:", question)
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -24,13 +36,6 @@ export class BackendService {
 
     const database = "./lancedb";
 
-    const model = new OpenAI({
-			modelName: "gpt-4",
-			openAIApiKey: OPENAI_API_KEY,
-      temperature: 0.5,
-			verbose: true
-		});
-
     const db = await connect(database);
     const table = await db.openTable('vectors')
 
@@ -38,10 +43,13 @@ export class BackendService {
     const vectorStore = new LanceDB(new OpenAIEmbeddings, { table })
     const retriever = vectorStore.asRetriever(1);
 
+    if (!question.prompt) {
+      question.prompt = "Answer the question based on only the following context. If the information is not in the context, use your previous knowledge to answer the question.";
+    }
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "ai",
-        `Answer the question based on only the following context. If the information is not in the context, use your previous knowledge to answer the question.
+        `${question.prompt}
 
 {context}`,
       ],
@@ -58,11 +66,9 @@ export class BackendService {
       question: new RunnablePassthrough(),
     });
 
-    const chain = setupAndRetrieval.pipe(prompt).pipe(model).pipe(outputParser)
+    const chain = setupAndRetrieval.pipe(prompt).pipe(this.model).pipe(outputParser)
 
-    console.log("Ready to invoke")
-    const response = await chain.invoke(question);
-    console.log("Invoked successfully")
+    const response = await chain.invoke(question.content);
 
     console.log("Answer:", response)
     return response;

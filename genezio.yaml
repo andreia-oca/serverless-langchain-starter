@@ -15,15 +15,11 @@ backend:
     # The package manager used by the backend.
     packageManager: npm
     architecture: x86_64
-  # Scripts are running in the specified `path` directory.
-  scripts:
-    # List of scripts to run before deploying the backend.
-    deploy:
-      - npm install @lancedb/vectordb-linux-x64-gnu
-      - npm install
     # List of scripts to run before starting `genezio local`.
-    local: npm install
-  # The cloud provider where the backend is deployed.
+    scripts:
+      deploy: npm install
+      local: npm install
+    # The cloud provider where the backend is deployed.
   cloudProvider: genezio
 # Information about the frontend, including the path, language, and publish directory.
 # It is optional. It can also be an array if there are multiple frontends you want to deploy.
@@ -42,6 +38,10 @@ frontend:
     deploy:
       - npm install @genezio-sdk/${{projectName}}@1.0.0-${{stage}}
       - npm install
+    start:
+      - npm install
+      - npm run dev
     # List of scripts that build your frontend before deployment. It should populate the specified `publish` directory.
     build: npm run build
     # List of scripts to run when starting the local development server.
+  subdomain: gnz-langchain-starter

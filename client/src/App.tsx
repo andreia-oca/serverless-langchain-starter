@@ -1,6 +1,6 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
-import { BackendService } from "@genezio-sdk/langchain-starter";
+import { BackendService, UserQuestion } from "@genezio-sdk/langchain-starter";
 import "./App.css";
 
 const Spinner = () => (
@@ -12,13 +12,17 @@ const Spinner = () => (
 export default function App() {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
 
   async function askOpenAI() {
     setIsLoading(true);
+    const q: UserQuestion = {
+      content: question,
+      prompt: prompt,
+    };
     setTimeout(async () => {
-      setResponse(await BackendService.ask(question));
+      setResponse(await BackendService.ask(q));
       setIsLoading(false);
     }, 10000);
   }
@@ -52,16 +56,23 @@ export default function App() {
         />
         <br />
         <br />
+        <input
+          type="text"
+          className="input-box"
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="What's your prompt?"
+        />
+        <br />
+        <br />
 
-      <div>
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <button onClick={askOpenAI}>Get your answer</button>
-      )}
-      <p className="read-the-docs">{response}</p>
-      </div>
-
+        <div>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <button onClick={askOpenAI}>Get your answer</button>
+          )}
+          <p className="read-the-docs">{response}</p>
+        </div>
       </div>
     </>
   );
